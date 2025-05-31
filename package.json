@@ -17,9 +17,20 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "mikro:debug": "mikro-orm debug",
+    "mikro:migrate": "mikro-orm migration:create",
+    "mikro:migrate:up": "mikro-orm migration:up",
+    "mikro:migrate:down": "mikro-orm migration:down",
+    "mikro:migrate:list": "mikro-orm migration:list",
+    "mikro:migrate:check": "mikro-orm migration:check",
+    "mikro:migrate:pending": "mikro-orm migration:pending",
+    "mikro:migrate:fresh": "mikro-orm migration:fresh"
   },
   "dependencies": {
+    "@mikro-orm/core": "^6.4.16",
+    "@mikro-orm/nestjs": "^6.1.1",
+    "@mikro-orm/postgresql": "^6.4.16",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
@@ -29,6 +40,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
+    "@mikro-orm/cli": "^6.4.16",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
@@ -69,5 +81,11 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "mikro-orm": {
+    "configPaths": [
+      "./src/mikro-orm.config.ts",
+      "./dist/mikro-orm.config.js"
+    ]
   }
 }
