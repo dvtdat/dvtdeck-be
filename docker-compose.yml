@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: dvtdeck-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dvtdeck_db
+      POSTGRES_USER: dvtdeck_user
+      POSTGRES_PASSWORD: your_secure_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - dvtdeck-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dvtdeck_user -d dvtdeck_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # NestJS Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: dvtdeck-app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: dvtdeck_db
+      DATABASE_USER: dvtdeck_user
+      DATABASE_PASSWORD: your_secure_password
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dvtdeck-network
+    volumes:
+      - ./uploads:/app/uploads # For file uploads
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  dvtdeck-network:
+    driver: bridge

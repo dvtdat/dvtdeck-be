@@ -1,18 +1,21 @@
 import { Migrator } from '@mikro-orm/migrations';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const config = {
   entities: ['./dist/entities'],
   entitiesTs: ['./src/entities'],
-  dbName: 'dvtdeck',
-  host: 'localhost',
-  port: 5432,
-  user: 'dvtdat',
-  password: '12345678',
+  dbName: process.env.DATABASE_NAME ?? 'admin',
+  host: process.env.DATABASE_HOST ?? 'localhost',
+  port: parseInt(process.env.DATABASE_PORT ?? '') ?? 5432,
+  user: process.env.DATABASE_USER ?? 'admin',
+  password: process.env.DATABASE_PASSWORD ?? '',
   driver: PostgreSqlDriver,
   metadataProvider: TsMorphMetadataProvider,
-  debug: true,
+  debug: process.env.NODE_ENV !== 'production',
   extensions: [Migrator],
   migrations: {
     path: './migrations',

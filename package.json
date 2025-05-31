@@ -25,7 +25,17 @@
     "mikro:migrate:list": "mikro-orm migration:list",
     "mikro:migrate:check": "mikro-orm migration:check",
     "mikro:migrate:pending": "mikro-orm migration:pending",
-    "mikro:migrate:fresh": "mikro-orm migration:fresh"
+    "mikro:migrate:fresh": "mikro-orm migration:fresh",
+    "docker:build": "docker build -t dvtdeck-app .",
+    "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build",
+    "docker:prod": "docker-compose up -d --build",
+    "docker:stop": "docker-compose down",
+    "docker:clean": "docker-compose down -v --rmi all",
+    "docker:logs": "docker-compose logs -f app",
+    "docker:db": "docker-compose up -d postgres",
+    "docker:migrate": "docker-compose exec app yarn mikro-orm migration:up",
+    "docker:seed": "docker-compose exec app yarn seed",
+    "docker:shell": "docker-compose exec app sh"
   },
   "dependencies": {
     "@mikro-orm/core": "^6.4.16",

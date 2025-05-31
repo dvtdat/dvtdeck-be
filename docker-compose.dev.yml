@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      target: base  # Use development stage
+    environment:
+      NODE_ENV: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./uploads:/app/uploads
+    command: yarn start:dev  # Hot reload in development
+    ports:
+      - "3000:3000"
+      - "9229:9229"  # Debug port
