@@ -1,9 +1,9 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, Populate } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from 'src/dtos';
-import { User, UserProfile } from 'src/entities';
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { User, UserProfile } from '@/entities';
 
 @Injectable()
 export class UserService {
@@ -63,6 +63,9 @@ export class UserService {
   }
 
   async getUserById(id: number, populateOption: Populate<User, any>) {
-    return this.userRepository.findOne({ id }, { populate: populateOption });
+    return await this.userRepository.findOne(
+      { id },
+      { populate: populateOption },
+    );
   }
 }
