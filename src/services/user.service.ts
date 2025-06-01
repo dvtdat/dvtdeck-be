@@ -1,8 +1,9 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository } from '@mikro-orm/postgresql';
+import { EntityRepository, Populate } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from 'src/dtos';
 import { User, UserProfile } from 'src/entities';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -18,10 +19,15 @@ export class UserService {
     this.userProfileRepository = userProfileRepository;
   }
 
+  private async verifyPassword(password: string, hashedPassword: string) {
+    return await bcrypt.compare(password, hashedPassword);
+  }
+
   async createUser(createUserDto: CreateUserDto) {
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = new User(
       createUserDto.email,
-      createUserDto.password,
+      hashedPassword,
       createUserDto.username,
     );
 
@@ -29,20 +35,34 @@ export class UserService {
 
     user.profile = userProfile;
 
-    await this.userRepository
+    return await this.userRepository
       .getEntityManager()
       .persistAndFlush([user, userProfile]);
   }
 
-  async getAllUser() {
-    return this.userRepository.findAll();
+  async getUsersPaginated(
+    query: Record<string, any>,
+    populateOption: Populate<User, any>,
+    pageSize: number,
+    pageNumber: number,
+  ) {
+    const [users, total] = await this.userRepository.findAndCount(query, {
+      limit: pageSize,
+      offset: (pageNumber - 1) * pageSize,
+      orderBy: { id: 'asc' },
+      populate: populateOption,
+    });
+
+    return {
+      data: users,
+      total,
+      pageSize,
+      pageNumber,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
-  async getUser(id: number) {
-    return this.userRepository.findOne({ id });
-  }
-
-  async getUserWithProfile(id: number) {
-    return this.userRepository.findOne({ id }, { populate: ['profile'] });
+  async getUserById(id: number, populateOption: Populate<User, any>) {
+    return this.userRepository.findOne({ id }, { populate: populateOption });
   }
 }
