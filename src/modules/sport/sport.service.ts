@@ -1,7 +1,8 @@
 import { Sport } from '@/entities/sport.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository } from '@mikro-orm/postgresql';
+import { EntityRepository, Populate } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
+import { CreateSportDto } from './dtos/create-sport.dto';
 
 @Injectable()
 export class SportService {
@@ -12,4 +13,43 @@ export class SportService {
   ) {
     this.sportRepository = sportRepository;
   }
+
+  async createSport(createSportDto: CreateSportDto) {
+    const sport = new Sport(
+      createSportDto.name,
+      createSportDto.description ?? '',
+    );
+
+    return await this.sportRepository
+      .getEntityManager()
+      .persistAndFlush([sport]);
+  }
+
+  async getSportPaginated(
+    query: Record<string, any>,
+    populateOption: Populate<Sport, any>,
+    pageSize: number,
+    pageNumber: number,
+  ) {
+    const [sports, total] = await this.sportRepository.findAndCount(query, {
+      limit: pageSize,
+      offset: (pageNumber - 1) * pageSize,
+      orderBy: { id: 'asc' },
+      populate: populateOption,
+    });
+
+    return {
+      data: sports,
+      total,
+      pageSize,
+      pageNumber,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
+
+  async getSportById(id: number) {
+    return await this.sportRepository.findOne({ id });
+  }
+
+  async deleteSportById() {}
 }
