@@ -48,8 +48,20 @@ export class SportService {
   }
 
   async getSportById(id: number) {
-    return await this.sportRepository.findOne({ id });
+    const sport = await this.sportRepository.findOne({ id });
+    if (!sport) {
+      throw new Error(`Sport with ID ${id} not found`);
+    }
+
+    return sport;
   }
 
-  async deleteSportById() {}
+  async deleteSportById(id: number) {
+    const sport = await this.sportRepository.findOne({ id });
+    if (!sport) {
+      throw new Error(`Sport with ID ${id} not found`);
+    }
+
+    return await this.sportRepository.getEntityManager().removeAndFlush(sport);
+  }
 }

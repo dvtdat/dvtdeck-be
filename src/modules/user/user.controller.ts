@@ -3,6 +3,7 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from '@/entities';
+import { GetUsersPaginatedDto } from './dtos/get-users-paginated.dto';
 
 @Controller('users')
 export class UserController {
@@ -31,21 +32,17 @@ export class UserController {
   }
 
   @Get()
-  async getUsersPaginated(
-    @Query('pageSize') pageSize: string = '10',
-    @Query('pageNumber') pageNumber: string = '1',
-    @Query('populate') populate: string = 'true',
-  ) {
-    const shouldPopulate = populate.toLowerCase() === 'true';
-    const populateOption: Populate<User, any> = shouldPopulate
+  async getUsersPaginated(@Query() query: GetUsersPaginatedDto) {
+    const { pageSize, pageNumber, populate } = query;
+    const populateOption: Populate<User, any> = populate
       ? (['profile'] as const)
       : ([] as const);
 
     return this.userService.getUsersPaginated(
       {},
       populateOption,
-      parseInt(pageSize, 10),
-      parseInt(pageNumber, 10),
+      pageSize,
+      pageNumber,
     );
   }
 }
