@@ -32,12 +32,15 @@ export class SportService {
     pageSize: number,
     pageNumber: number,
   ) {
-    const [sports, total] = await this.sportRepository.findAndCount(query, {
-      limit: pageSize,
-      offset: (pageNumber - 1) * pageSize,
-      orderBy: { id: 'asc' },
-      populate: populateOption,
-    });
+    const [sports, total] = await this.sportRepository.findAndCount(
+      { ...query, deletedAt: null },
+      {
+        limit: pageSize,
+        offset: (pageNumber - 1) * pageSize,
+        orderBy: { id: 'asc' },
+        populate: populateOption,
+      },
+    );
 
     return {
       data: sports,
@@ -49,7 +52,7 @@ export class SportService {
   }
 
   async getSportById(id: number) {
-    const sport = await this.sportRepository.findOne({ id });
+    const sport = await this.sportRepository.findOne({ id, deletedAt: null });
     if (!sport) {
       throw new Error(`Sport with ID ${id} not found`);
     }
@@ -58,7 +61,7 @@ export class SportService {
   }
 
   async updateSportById(id: number, updateSportDto: UpdateSportDto) {
-    const sport = await this.sportRepository.findOne({ id });
+    const sport = await this.sportRepository.findOne({ id, deletedAt: null });
     if (!sport) {
       throw new Error(`Sport with ID ${id} not found`);
     }
@@ -70,11 +73,12 @@ export class SportService {
   }
 
   async deleteSportById(id: number) {
-    const sport = await this.sportRepository.findOne({ id });
+    const sport = await this.sportRepository.findOne({ id, deletedAt: null });
     if (!sport) {
       throw new Error(`Sport with ID ${id} not found`);
     }
 
-    return await this.sportRepository.getEntityManager().removeAndFlush(sport);
+    sport.deletedAt = new Date();
+    await this.sportRepository.getEntityManager().persistAndFlush(sport);
   }
 }
