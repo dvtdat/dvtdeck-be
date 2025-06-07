@@ -6,6 +6,7 @@ import config from './mikro-orm.config';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SportModule } from './modules/sport/sport.module';
+import { VenueModule } from './modules/venue/venue.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SportModule } from './modules/sport/sport.module';
     UserModule,
     AuthModule,
     SportModule,
+    VenueModule,
   ],
   controllers: [AppController],
   providers: [AppService],
