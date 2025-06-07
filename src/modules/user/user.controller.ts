@@ -1,5 +1,14 @@
 import { Populate } from '@mikro-orm/core';
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from '@/entities';
@@ -44,4 +53,10 @@ export class UserController {
       pageNumber,
     );
   }
+
+  @Patch(':id')
+  async updateUserById(@Param('id') id: number) {}
+
+  @Delete('id')
+  async deleteUserById(@Param('id') id: number) {}
 }
