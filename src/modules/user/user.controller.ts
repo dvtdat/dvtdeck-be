@@ -1,9 +1,10 @@
 import { Populate } from '@mikro-orm/core';
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from '@/entities';
 import { GetUsersPaginatedDto } from './dtos/get-users-paginated.dto';
+import { GetUserByIdDto } from './dtos/get-user-by-id.dto';
 
 @Controller('users')
 export class UserController {
@@ -19,12 +20,9 @@ export class UserController {
   }
 
   @Get(':id')
-  async getUser(
-    @Param('id') id: number,
-    @Query('populate') populate: string = 'false',
-  ) {
-    const shouldPopulate = populate.toLowerCase() === 'true';
-    const populateOption: Populate<User, any> = shouldPopulate
+  async getUser(@Query() query: GetUserByIdDto) {
+    const { id, populate } = query;
+    const populateOption: Populate<User, any> = populate
       ? (['profile'] as const)
       : ([] as const);
 
@@ -34,6 +32,7 @@ export class UserController {
   @Get()
   async getUsersPaginated(@Query() query: GetUsersPaginatedDto) {
     const { pageSize, pageNumber, populate } = query;
+
     const populateOption: Populate<User, any> = populate
       ? (['profile'] as const)
       : ([] as const);

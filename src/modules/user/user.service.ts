@@ -40,6 +40,13 @@ export class UserService {
       .persistAndFlush([user, userProfile]);
   }
 
+  async getUserById(id: number, populateOption: Populate<User, any>) {
+    return await this.userRepository.findOne(
+      { id },
+      { populate: populateOption },
+    );
+  }
+
   async getUsersPaginated(
     query: Record<string, any>,
     populateOption: Populate<User, any>,
@@ -60,12 +67,5 @@ export class UserService {
       pageNumber,
       totalPages: Math.ceil(total / pageSize),
     };
-  }
-
-  async getUserById(id: number, populateOption: Populate<User, any>) {
-    return await this.userRepository.findOne(
-      { id },
-      { populate: populateOption },
-    );
   }
 }
