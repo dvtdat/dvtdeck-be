@@ -3,6 +3,7 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, Populate } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
 import { CreateSportDto } from './dtos/create-sport.dto';
+import { UpdateSportDto } from './dtos/update-sport.dto';
 
 @Injectable()
 export class SportService {
@@ -52,6 +53,18 @@ export class SportService {
     if (!sport) {
       throw new Error(`Sport with ID ${id} not found`);
     }
+
+    return sport;
+  }
+
+  async updateSportById(id: number, updateSportDto: UpdateSportDto) {
+    const sport = await this.sportRepository.findOne({ id });
+    if (!sport) {
+      throw new Error(`Sport with ID ${id} not found`);
+    }
+
+    this.sportRepository.assign(sport, updateSportDto);
+    await this.sportRepository.getEntityManager().persistAndFlush(sport);
 
     return sport;
   }

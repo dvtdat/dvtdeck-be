@@ -42,7 +42,7 @@ export class UserService {
 
   async getUserById(id: number, populateOption: Populate<User, any>) {
     return await this.userRepository.findOne(
-      { id },
+      { id, deletedAt: null },
       { populate: populateOption },
     );
   }
@@ -53,12 +53,15 @@ export class UserService {
     pageSize: number,
     pageNumber: number,
   ) {
-    const [users, total] = await this.userRepository.findAndCount(query, {
-      limit: pageSize,
-      offset: (pageNumber - 1) * pageSize,
-      orderBy: { id: 'asc' },
-      populate: populateOption,
-    });
+    const [users, total] = await this.userRepository.findAndCount(
+      { ...query, deletedAt: null },
+      {
+        limit: pageSize,
+        offset: (pageNumber - 1) * pageSize,
+        orderBy: { id: 'asc' },
+        populate: populateOption,
+      },
+    );
 
     return {
       data: users,

@@ -11,6 +11,7 @@ import {
 import { SportService } from './sport.service';
 import { CreateSportDto } from './dtos/create-sport.dto';
 import { GetSportsPaginatedDto } from './dtos/get-sports-paginated.dto';
+import { UpdateSportDto } from './dtos/update-sport.dto';
 
 @Controller('sport')
 export class SportController {
@@ -37,7 +38,16 @@ export class SportController {
   }
 
   @Patch(':id')
-  async updateSportById() {}
+  async updateSportById(@Param('id') id: number, @Body() body: UpdateSportDto) {
+    const sport = await this.sportService.getSportById(id);
+
+    const updateSportDto: UpdateSportDto = {
+      name: body.name ?? sport.name,
+      description: body.description ?? sport.description,
+    };
+
+    return this.sportService.updateSportById(id, updateSportDto);
+  }
 
   @Delete(':id')
   async deleteSportById() {}

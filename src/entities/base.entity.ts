@@ -14,4 +14,7 @@ export abstract class BaseEntity {
     defaultRaw: 'current_timestamp',
   })
   updatedAt = new Date();
+
+  @Property({ type: 'timestamptz', nullable: true })
+  deletedAt?: Date;
 }
