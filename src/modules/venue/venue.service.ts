@@ -3,6 +3,7 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, Populate } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
 import { CreateVenueDto } from './dtos/create-venue.dto';
+import { UpdateVenueDto } from './dtos/update-venue.dto';
 
 @Injectable()
 export class VenueService {
@@ -51,5 +52,36 @@ export class VenueService {
       pageNumber,
       totalPages: Math.ceil(total / pageSize),
     };
+  }
+
+  async getVenueById(id: number) {
+    const venue = await this.venueRepository.findOne({ id, deletedAt: null });
+    if (!venue) {
+      throw new Error(`Venue with ID ${id} not found`);
+    }
+
+    return venue;
+  }
+
+  async updateVenueById(id: number, updateVenueDto: UpdateVenueDto) {
+    const venue = await this.venueRepository.findOne({ id, deletedAt: null });
+    if (!venue) {
+      throw new Error(`Venue with ID ${id} not found`);
+    }
+
+    this.venueRepository.assign(venue, updateVenueDto);
+    await this.venueRepository.getEntityManager().persistAndFlush(venue);
+
+    return venue;
+  }
+
+  async deleteVenueById(id: number) {
+    const venue = await this.venueRepository.findOne({ id, deletedAt: null });
+    if (!venue) {
+      throw new Error(`Venue with ID ${id} not found`);
+    }
+
+    venue.deletedAt = new Date();
+    await this.venueRepository.getEntityManager().persistAndFlush(venue);
   }
 }

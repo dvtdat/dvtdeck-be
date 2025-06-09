@@ -51,12 +51,6 @@ export class SportController {
 
   @Delete(':id')
   async deleteSportById(@Param('id') id: number) {
-    const sport = await this.sportService.getSportById(id);
-
-    if (!sport) {
-      throw new Error('Sport not found');
-    }
-
     return this.sportService.deleteSportById(id);
   }
 }
