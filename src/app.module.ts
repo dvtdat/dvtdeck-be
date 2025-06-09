@@ -16,7 +16,7 @@ import { VenueModule } from './modules/venue/venue.module';
     SportModule,
     VenueModule,
   ],
-  controllers: [AppController],
   providers: [AppService],
+  controllers: [AppController],
 })
 export class AppModule {}
