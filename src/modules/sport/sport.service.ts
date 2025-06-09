@@ -1,7 +1,11 @@
 import { Sport } from '@/entities/sport.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, Populate } from '@mikro-orm/postgresql';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateSportDto } from './dtos/create-sport.dto';
 import { UpdateSportDto } from './dtos/update-sport.dto';
 
@@ -54,28 +58,37 @@ export class SportService {
   async getSportById(id: number) {
     const sport = await this.sportRepository.findOne({ id, deletedAt: null });
     if (!sport) {
-      throw new Error(`Sport with ID ${id} not found`);
+      throw new NotFoundException(`Sport with ID ${id} not found`);
     }
 
     return sport;
   }
 
   async updateSportById(id: number, updateSportDto: UpdateSportDto) {
-    const sport = await this.sportRepository.findOne({ id, deletedAt: null });
-    if (!sport) {
-      throw new Error(`Sport with ID ${id} not found`);
+    const newDto = Object.fromEntries(
+      Object.entries(updateSportDto).filter(([, value]) => value !== undefined),
+    );
+
+    if (Object.keys(newDto).length === 0) {
+      throw new BadRequestException('No valid fields to update');
     }
 
-    this.sportRepository.assign(sport, updateSportDto);
-    await this.sportRepository.getEntityManager().persistAndFlush(sport);
+    const result = await this.sportRepository.nativeUpdate(
+      { id, deletedAt: null },
+      newDto,
+    );
 
-    return sport;
+    if (result === 0) {
+      throw new NotFoundException(`Sport with ID ${id} not found`);
+    }
+
+    return await this.sportRepository.findOne({ id, deletedAt: null });
   }
 
   async deleteSportById(id: number) {
     const sport = await this.sportRepository.findOne({ id, deletedAt: null });
     if (!sport) {
-      throw new Error(`Sport with ID ${id} not found`);
+      throw new NotFoundException(`Sport with ID ${id} not found`);
     }
 
     sport.deletedAt = new Date();

@@ -39,14 +39,7 @@ export class SportController {
 
   @Patch(':id')
   async updateSportById(@Param('id') id: number, @Body() body: UpdateSportDto) {
-    const sport = await this.sportService.getSportById(id);
-
-    const updateSportDto: UpdateSportDto = {
-      name: body.name ?? sport.name,
-      description: body.description ?? sport.description,
-    };
-
-    return this.sportService.updateSportById(id, updateSportDto);
+    return this.sportService.updateSportById(id, body);
   }
 
   @Delete(':id')
