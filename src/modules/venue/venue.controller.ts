@@ -39,17 +39,7 @@ export class VenueController {
 
   @Patch(':id')
   async updateVenueById(@Param('id') id: number, @Body() body: UpdateVenueDto) {
-    const venue = await this.venueService.getVenueById(id);
-
-    const updateVenueDto: UpdateVenueDto = {
-      name: body.name ?? venue.name,
-      address: body.address ?? venue.address,
-      contactInfo: body.contactInfo ?? venue.contactInfo,
-      description: body.description ?? venue.description,
-      isActive: body.isActive ?? venue.isActive,
-    };
-
-    return await this.venueService.updateVenueById(id, updateVenueDto);
+    return await this.venueService.updateVenueById(id, body);
   }
 
   @Delete(':id')

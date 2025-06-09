@@ -1,7 +1,11 @@
 import { Venue } from '@/entities/venue.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, Populate } from '@mikro-orm/postgresql';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateVenueDto } from './dtos/create-venue.dto';
 import { UpdateVenueDto } from './dtos/update-venue.dto';
 
@@ -57,28 +61,37 @@ export class VenueService {
   async getVenueById(id: number) {
     const venue = await this.venueRepository.findOne({ id, deletedAt: null });
     if (!venue) {
-      throw new Error(`Venue with ID ${id} not found`);
+      throw new NotFoundException(`Venue with ID ${id} not found`);
     }
 
     return venue;
   }
 
   async updateVenueById(id: number, updateVenueDto: UpdateVenueDto) {
-    const venue = await this.venueRepository.findOne({ id, deletedAt: null });
-    if (!venue) {
-      throw new Error(`Venue with ID ${id} not found`);
+    const newDto = Object.fromEntries(
+      Object.entries(updateVenueDto).filter(([, value]) => value !== undefined),
+    );
+
+    if (Object.keys(newDto).length === 0) {
+      throw new BadRequestException('No valid fields to update');
     }
 
-    this.venueRepository.assign(venue, updateVenueDto);
-    await this.venueRepository.getEntityManager().persistAndFlush(venue);
+    const result = await this.venueRepository.nativeUpdate(
+      { id, deletedAt: null },
+      newDto,
+    );
 
-    return venue;
+    if (result === 0) {
+      throw new NotFoundException(`Venue with ID ${id} not found`);
+    }
+
+    return await this.venueRepository.findOne({ id, deletedAt: null });
   }
 
   async deleteVenueById(id: number) {
     const venue = await this.venueRepository.findOne({ id, deletedAt: null });
     if (!venue) {
-      throw new Error(`Venue with ID ${id} not found`);
+      throw new NotFoundException(`Venue with ID ${id} not found`);
     }
 
     venue.deletedAt = new Date();
