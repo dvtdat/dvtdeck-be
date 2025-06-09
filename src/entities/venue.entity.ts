@@ -1,5 +1,6 @@
-import { Entity, Property } from '@mikro-orm/core';
+import { Collection, Entity, OneToMany, Property } from '@mikro-orm/core';
 import { BaseEntity } from './base.entity';
+import { VenueCourt } from './venue-court.entity';
 
 @Entity()
 export class Venue extends BaseEntity {
@@ -17,6 +18,9 @@ export class Venue extends BaseEntity {
 
   @Property({ type: 'boolean', default: true })
   isActive!: boolean;
+
+  @OneToMany(() => VenueCourt, (court) => court.venue)
+  courts = new Collection<VenueCourt>(this);
 
   constructor(
     name: string,

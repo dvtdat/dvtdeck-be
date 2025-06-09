@@ -46,4 +46,28 @@ export class VenueController {
   async deleteVenueById(@Param('id') id: number) {
     return this.venueService.deleteVenueById(id);
   }
+
+  @Post('court')
+  async createVenueCourt() {}
+
+  @Get('court')
+  async getVenueCourtsPaginated() {}
+
+  @Get('court/:venueId')
+  async getVenueCourtsByVenueId() {}
+
+  @Get('court/:id')
+  async getVenueCourtById() {}
+
+  @Patch('court/:id')
+  async updateVenueCourtById() {
+    // handle update name (easy)
+    // handle change sport (easy)
+    // handle changing court (harder)
+  }
+
+  @Delete('court/:id')
+  async deleteCourtById() {
+    // remove from venue_court and venue
+  }
 }
