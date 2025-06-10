@@ -8,15 +8,21 @@ import {
 } from '@nestjs/common';
 import { CreateVenueDto } from './dtos/create-venue.dto';
 import { UpdateVenueDto } from './dtos/update-venue.dto';
+import { Sport } from '@/entities/sport.entity';
+import { VenueCourt } from '@/entities/venue-court.entity';
 
 @Injectable()
 export class VenueService {
   private venueRepository: EntityRepository<Venue>;
+  private venueCourtRepository: EntityRepository<VenueCourt>;
 
   constructor(
     @InjectRepository(Venue) venueRepository: EntityRepository<Venue>,
+    @InjectRepository(VenueCourt)
+    venueCourtRepository: EntityRepository<VenueCourt>,
   ) {
     this.venueRepository = venueRepository;
+    this.venueCourtRepository = venueCourtRepository;
   }
 
   async createVenue(createVenueDto: CreateVenueDto) {
@@ -96,5 +102,16 @@ export class VenueService {
 
     venue.deletedAt = new Date();
     await this.venueRepository.getEntityManager().persistAndFlush(venue);
+  }
+
+  async createVenueCourt(name: string, venue: Venue, sport: Sport) {
+    const venueCourt = new VenueCourt(name, venue, sport);
+    venue.courts.add(venueCourt);
+
+    await this.venueRepository.getEntityManager().persistAndFlush(venue);
+
+    return this.venueCourtRepository
+      .getEntityManager()
+      .persistAndFlush(venueCourt);
   }
 }

@@ -12,14 +12,15 @@ import { VenueService } from './venue.service';
 import { CreateVenueDto } from './dtos/create-venue.dto';
 import { GetVenuesPaginatedDto } from './dtos/get-venues-paginated.dto';
 import { UpdateVenueDto } from './dtos/update-venue.dto';
+import { CreateVenueCourtDto } from './dtos/create-venue-court.dto';
+import { SportService } from '../sport/sport.service';
 
 @Controller('venue')
 export class VenueController {
-  private readonly venueService: VenueService;
-
-  constructor(venueService: VenueService) {
-    this.venueService = venueService;
-  }
+  constructor(
+    private readonly venueService: VenueService,
+    private readonly sportService: SportService,
+  ) {}
 
   @Post()
   async createVenue(@Body() createVenueDto: CreateVenueDto) {
@@ -48,7 +49,14 @@ export class VenueController {
   }
 
   @Post('court')
-  async createVenueCourt() {}
+  async createVenueCourt(@Body() createVenueCourtDto: CreateVenueCourtDto) {
+    const { name, venueId, sportId } = createVenueCourtDto;
+
+    const venue = await this.venueService.getVenueById(venueId);
+    const sport = await this.sportService.getSportById(sportId);
+
+    return this.venueService.createVenueCourt(name, venue, sport);
+  }
 
   @Get('court')
   async getVenueCourtsPaginated() {}
