@@ -14,6 +14,7 @@ import { GetVenuesPaginatedDto } from './dtos/get-venues-paginated.dto';
 import { UpdateVenueDto } from './dtos/update-venue.dto';
 import { CreateVenueCourtDto } from './dtos/create-venue-court.dto';
 import { SportService } from '../sport/sport.service';
+import { GetVenueCourtsPaginatedDto } from './dtos/get-venue-courts-paginated.dto';
 
 @Controller('venue')
 export class VenueController {
@@ -21,34 +22,36 @@ export class VenueController {
     private readonly venueService: VenueService,
     private readonly sportService: SportService,
   ) {}
-
-  @Post()
+  @Post('create')
   async createVenue(@Body() createVenueDto: CreateVenueDto) {
     return await this.venueService.createVenue(createVenueDto);
   }
 
-  @Get()
+  @Get('list')
   async getVenuesPaginated(@Query() query: GetVenuesPaginatedDto) {
     const { pageSize, pageNumber } = query;
     return this.venueService.getSportPaginated({}, false, pageSize, pageNumber);
   }
 
-  @Get(':id')
-  async getVenueById(@Param('id') id: number) {
-    return await this.venueService.getVenueById(id);
+  @Get('details/:venueId')
+  async getVenueById(@Param('venueId') venueId: number) {
+    return await this.venueService.getVenueById(venueId);
   }
 
-  @Patch(':id')
-  async updateVenueById(@Param('id') id: number, @Body() body: UpdateVenueDto) {
-    return await this.venueService.updateVenueById(id, body);
+  @Patch('update/:venueId')
+  async updateVenueById(
+    @Param('venueId') venueId: number,
+    @Body() body: UpdateVenueDto,
+  ) {
+    return await this.venueService.updateVenueById(venueId, body);
   }
 
-  @Delete(':id')
-  async deleteVenueById(@Param('id') id: number) {
-    return this.venueService.deleteVenueById(id);
+  @Delete('delete/:venueId')
+  async deleteVenueById(@Param('venueId') venueId: number) {
+    return this.venueService.deleteVenueById(venueId);
   }
 
-  @Post('court')
+  @Post('court/create')
   async createVenueCourt(@Body() createVenueCourtDto: CreateVenueCourtDto) {
     const { name, venueId, sportId } = createVenueCourtDto;
 
@@ -58,14 +61,18 @@ export class VenueController {
     return this.venueService.createVenueCourt(name, venue, sport);
   }
 
-  @Get('court')
-  async getVenueCourtsPaginated() {}
-
-  @Get('court/:venueId')
-  async getVenueCourtsByVenueId() {}
-
-  @Get('court/:id')
-  async getVenueCourtById() {}
+  @Get('court/list')
+  getVenueCourtsPaginated(@Query() query: GetVenueCourtsPaginatedDto) {
+    const { pageSize, pageNumber, venueIds } = query;
+    console.log('this', venueIds);
+    return this.venueService.getVenueCourtsPaginated(
+      {},
+      false,
+      pageSize,
+      pageNumber,
+      venueIds,
+    );
+  }
 
   @Patch('court/:id')
   async updateVenueCourtById() {

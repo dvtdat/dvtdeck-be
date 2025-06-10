@@ -114,4 +114,34 @@ export class VenueService {
       .getEntityManager()
       .persistAndFlush(venueCourt);
   }
+
+  async getVenueCourtsPaginated(
+    query: Record<string, any>,
+    populateOption: Populate<Venue, any>,
+    pageSize: number,
+    pageNumber: number,
+    venueIds: number[],
+  ) {
+    const [courts, total] = await this.venueCourtRepository.findAndCount(
+      {
+        ...query,
+        venue: { id: { $in: venueIds } },
+        deletedAt: null,
+      },
+      {
+        limit: pageSize,
+        offset: (pageNumber - 1) * pageSize,
+        orderBy: { id: 'asc' },
+        populate: populateOption,
+      },
+    );
+
+    return {
+      data: courts,
+      total,
+      pageSize,
+      pageNumber,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
 }
