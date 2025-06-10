@@ -125,7 +125,7 @@ export class VenueService {
     const [courts, total] = await this.venueCourtRepository.findAndCount(
       {
         ...query,
-        venue: { id: { $in: venueIds } },
+        ...(venueIds?.length ? { venue: { id: { $in: venueIds } } } : {}),
         deletedAt: null,
       },
       {

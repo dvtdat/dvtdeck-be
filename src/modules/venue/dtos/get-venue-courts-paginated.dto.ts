@@ -4,7 +4,11 @@ import { Transform } from 'class-transformer';
 import { IsOptional, IsArray } from 'class-validator';
 
 export class GetVenueCourtsPaginatedDto extends GetPaginatedBaseDto {
-  @ApiProperty({ description: 'The IDs of the venues', type: [Number] })
+  @ApiProperty({
+    description: 'The IDs of the venues',
+    type: [Number],
+    required: false,
+  })
   @IsOptional()
   @IsArray()
   @Transform(({ value }) => {
