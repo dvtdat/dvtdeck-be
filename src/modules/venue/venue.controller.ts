@@ -15,6 +15,8 @@ import { UpdateVenueDto } from './dtos/update-venue.dto';
 import { CreateVenueCourtDto } from './dtos/create-venue-court.dto';
 import { SportService } from '../sport/sport.service';
 import { GetVenueCourtsPaginatedDto } from './dtos/get-venue-courts-paginated.dto';
+import { VenueCourt } from '@/entities/venue-court.entity';
+import { Populate } from '@mikro-orm/core';
 
 @Controller('venue')
 export class VenueController {
@@ -63,11 +65,14 @@ export class VenueController {
 
   @Get('court/list')
   getVenueCourtsPaginated(@Query() query: GetVenueCourtsPaginatedDto) {
-    const { pageSize, pageNumber, venueIds } = query;
-    console.log('this', venueIds);
+    const { pageSize, pageNumber, venueIds, populateSport } = query;
+    const populateOption: Populate<VenueCourt, any> = populateSport
+      ? (['sport'] as const)
+      : ([] as const);
+
     return this.venueService.getVenueCourtsPaginated(
       {},
-      false,
+      populateOption,
       pageSize,
       pageNumber,
       venueIds,

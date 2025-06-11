@@ -1,7 +1,7 @@
 import { GetPaginatedBaseDto } from '@/common/dtos';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsOptional, IsArray } from 'class-validator';
+import { IsOptional, IsArray, IsBoolean } from 'class-validator';
 
 export class GetVenueCourtsPaginatedDto extends GetPaginatedBaseDto {
   @ApiProperty({
@@ -16,4 +16,14 @@ export class GetVenueCourtsPaginatedDto extends GetPaginatedBaseDto {
     return [value as number];
   })
   venueIds: number[];
+
+  @ApiProperty({
+    description: 'Indicates whether to populate the sport information.',
+    type: Boolean,
+    required: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  populateSport: boolean = false;
 }
