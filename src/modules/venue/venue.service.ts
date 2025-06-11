@@ -64,8 +64,11 @@ export class VenueService {
     };
   }
 
-  async getVenueById(id: number) {
-    const venue = await this.venueRepository.findOne({ id, deletedAt: null });
+  async getVenueById(id: number, populateOption: Populate<Venue, any>) {
+    const venue = await this.venueRepository.findOne(
+      { id, deletedAt: null },
+      { populate: populateOption },
+    );
     if (!venue) {
       throw new NotFoundException(`Venue with ID ${id} not found`);
     }

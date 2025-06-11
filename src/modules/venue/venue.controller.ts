@@ -17,6 +17,7 @@ import { SportService } from '../sport/sport.service';
 import { GetVenueCourtsPaginatedDto } from './dtos/get-venue-courts-paginated.dto';
 import { VenueCourt } from '@/entities/venue-court.entity';
 import { Populate } from '@mikro-orm/core';
+import { GetVenueByIdDto } from './dtos/get-venue-by-id.dto';
 
 @Controller('venue')
 export class VenueController {
@@ -32,13 +33,28 @@ export class VenueController {
 
   @Get('list')
   async getVenuesPaginated(@Query() query: GetVenuesPaginatedDto) {
-    const { pageSize, pageNumber } = query;
-    return this.venueService.getVenuePaginated({}, false, pageSize, pageNumber);
+    const { pageSize, pageNumber, populate } = query;
+    const populateOption: Populate<VenueCourt, any> = populate
+      ? (['courts'] as const)
+      : ([] as const);
+
+    return this.venueService.getVenuePaginated(
+      {},
+      populateOption,
+      pageSize,
+      pageNumber,
+    );
   }
 
   @Get('details/:venueId')
-  async getVenueById(@Param('venueId') venueId: number) {
-    return await this.venueService.getVenueById(venueId);
+  async getVenueById(@Query() query: GetVenueByIdDto) {
+    const { id, populate } = query;
+
+    const populateOption: Populate<VenueCourt, any> = populate
+      ? (['courts'] as const)
+      : ([] as const);
+
+    return await this.venueService.getVenueById(id, populateOption);
   }
 
   @Patch('update/:venueId')
@@ -59,7 +75,7 @@ export class VenueController {
   async createVenueCourt(@Body() createVenueCourtDto: CreateVenueCourtDto) {
     const { name, venueId, sportId } = createVenueCourtDto;
 
-    const venue = await this.venueService.getVenueById(venueId);
+    const venue = await this.venueService.getVenueById(venueId, false);
     const sport = await this.sportService.getSportById(sportId);
 
     return this.venueService.createVenueCourt(name, venue, sport);
