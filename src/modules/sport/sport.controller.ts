@@ -21,28 +21,28 @@ export class SportController {
     this.sportService = sportService;
   }
 
-  @Post()
+  @Post('create')
   async createSport(@Body() createSportDto: CreateSportDto) {
     return await this.sportService.createSport(createSportDto);
   }
 
-  @Get(':id')
+  @Get('details/:id')
   async getSportById(@Param('id') id: number) {
     return await this.sportService.getSportById(id);
   }
 
-  @Get()
+  @Get('list')
   async getSportsPaginated(@Query() query: GetSportsPaginatedDto) {
     const { pageSize, pageNumber } = query;
     return this.sportService.getSportPaginated({}, false, pageSize, pageNumber);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   async updateSportById(@Param('id') id: number, @Body() body: UpdateSportDto) {
     return this.sportService.updateSportById(id, body);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   async deleteSportById(@Param('id') id: number) {
     return this.sportService.deleteSportById(id);
   }

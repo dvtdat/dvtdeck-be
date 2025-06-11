@@ -17,28 +17,14 @@ import { GetUserByIdDto } from './dtos/get-user-by-id.dto';
 
 @Controller('users')
 export class UserController {
-  private readonly userService: UserService;
+  constructor(private readonly userService: UserService) {}
 
-  constructor(userService: UserService) {
-    this.userService = userService;
-  }
-
-  @Post()
+  @Post('create')
   async createUser(@Body() createUserDto: CreateUserDto) {
     return await this.userService.createUser(createUserDto);
   }
 
-  @Get(':id')
-  async getUser(@Query() query: GetUserByIdDto) {
-    const { id, populate } = query;
-    const populateOption: Populate<User, any> = populate
-      ? (['profile'] as const)
-      : ([] as const);
-
-    return await this.userService.getUserById(id, populateOption);
-  }
-
-  @Get()
+  @Get('list')
   async getUsersPaginated(@Query() query: GetUsersPaginatedDto) {
     const { pageSize, pageNumber, populate } = query;
 
@@ -54,9 +40,19 @@ export class UserController {
     );
   }
 
-  @Patch(':id')
+  @Get('details/:id')
+  async getUser(@Query() query: GetUserByIdDto) {
+    const { id, populate } = query;
+    const populateOption: Populate<User, any> = populate
+      ? (['profile'] as const)
+      : ([] as const);
+
+    return await this.userService.getUserById(id, populateOption);
+  }
+
+  @Patch('update/:id')
   async updateUserById(@Param('id') id: number) {}
 
-  @Delete('id')
+  @Delete('delete/:id')
   async deleteUserById(@Param('id') id: number) {}
 }

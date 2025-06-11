@@ -24,6 +24,7 @@ export class VenueController {
     private readonly venueService: VenueService,
     private readonly sportService: SportService,
   ) {}
+
   @Post('create')
   async createVenue(@Body() createVenueDto: CreateVenueDto) {
     return await this.venueService.createVenue(createVenueDto);
