@@ -33,7 +33,7 @@ export class VenueController {
   @Get('list')
   async getVenuesPaginated(@Query() query: GetVenuesPaginatedDto) {
     const { pageSize, pageNumber } = query;
-    return this.venueService.getSportPaginated({}, false, pageSize, pageNumber);
+    return this.venueService.getVenuePaginated({}, false, pageSize, pageNumber);
   }
 
   @Get('details/:venueId')
@@ -51,6 +51,7 @@ export class VenueController {
 
   @Delete('delete/:venueId')
   async deleteVenueById(@Param('venueId') venueId: number) {
+    // remove all venue courts link to it
     return this.venueService.deleteVenueById(venueId);
   }
 
@@ -65,7 +66,7 @@ export class VenueController {
   }
 
   @Get('court/list')
-  getVenueCourtsPaginated(@Query() query: GetVenueCourtsPaginatedDto) {
+  async getVenueCourtsPaginated(@Query() query: GetVenueCourtsPaginatedDto) {
     const { pageSize, pageNumber, venueIds, populateSport } = query;
     const populateOption: Populate<VenueCourt, any> = populateSport
       ? (['sport'] as const)

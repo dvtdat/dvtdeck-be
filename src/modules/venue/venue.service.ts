@@ -39,7 +39,7 @@ export class VenueService {
       .persistAndFlush([venue]);
   }
 
-  async getSportPaginated(
+  async getVenuePaginated(
     query: Record<string, any>,
     populateOption: Populate<Venue, any>,
     pageSize: number,
@@ -143,5 +143,23 @@ export class VenueService {
       pageNumber,
       totalPages: Math.ceil(total / pageSize),
     };
+  }
+
+  async deleteVenueCourtById(id: number) {
+    const venueCourt = await this.venueCourtRepository.findOne({
+      id,
+      deletedAt: null,
+    });
+
+    if (!venueCourt) {
+      throw new NotFoundException(`Venue court with ID ${id} not found`);
+    }
+
+    venueCourt.deletedAt = new Date();
+    await this.venueCourtRepository
+      .getEntityManager()
+      .persistAndFlush(venueCourt);
+
+    return venueCourt;
   }
 }
