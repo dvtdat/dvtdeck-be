@@ -1,6 +1,10 @@
 import { Venue } from '@/entities/venue.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository, Populate } from '@mikro-orm/postgresql';
+import {
+  EntityRepository,
+  Populate,
+  Transactional,
+} from '@mikro-orm/postgresql';
 import {
   BadRequestException,
   Injectable,
@@ -97,16 +101,25 @@ export class VenueService {
     return await this.venueRepository.findOne({ id, deletedAt: null });
   }
 
+  @Transactional()
   async deleteVenueById(id: number) {
     const venue = await this.venueRepository.findOne({ id, deletedAt: null });
     if (!venue) {
       throw new NotFoundException(`Venue with ID ${id} not found`);
     }
 
-    venue.deletedAt = new Date();
+    const now = new Date();
+
+    await this.venueCourtRepository.nativeUpdate(
+      { venue: id, deletedAt: null },
+      { deletedAt: now },
+    );
+
+    venue.deletedAt = now;
     await this.venueRepository.getEntityManager().persistAndFlush(venue);
   }
 
+  @Transactional()
   async createVenueCourt(name: string, venue: Venue, sport: Sport) {
     const venueCourt = new VenueCourt(name, venue, sport);
     venue.courts.add(venueCourt);

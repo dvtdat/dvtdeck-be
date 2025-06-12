@@ -67,7 +67,6 @@ export class VenueController {
 
   @Delete('delete/:venueId')
   async deleteVenueById(@Param('venueId') venueId: number) {
-    // remove all venue courts link to it
     return this.venueService.deleteVenueById(venueId);
   }
 
@@ -101,7 +100,7 @@ export class VenueController {
   async updateVenueCourtById() {
     // handle update name (easy)
     // handle change sport (easy)
-    // handle changing court (harder)
+    // handle changing venue (harder)
   }
 
   @Delete('court/:id')
