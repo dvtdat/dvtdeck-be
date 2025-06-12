@@ -18,6 +18,9 @@ import { GetVenueCourtsPaginatedDto } from './dtos/get-venue-courts-paginated.dt
 import { VenueCourt } from '@/entities/venue-court.entity';
 import { Populate } from '@mikro-orm/core';
 import { GetVenueByIdDto } from './dtos/get-venue-by-id.dto';
+import { UpdateVenueCourtDto } from './dtos/update-venue-cout.dto';
+import { Venue } from '@/entities/venue.entity';
+import { Sport } from '@/entities/sport.entity';
 
 @Controller('venue')
 export class VenueController {
@@ -97,14 +100,32 @@ export class VenueController {
   }
 
   @Patch('court/:id')
-  async updateVenueCourtById() {
-    // handle update name (easy)
-    // handle change sport (easy)
-    // handle changing venue (harder)
+  async updateVenueCourtById(
+    @Param('id') id: number,
+    @Body() body: UpdateVenueCourtDto,
+  ) {
+    const { name, venueId, sportId } = body;
+
+    let venue: Venue | undefined = undefined;
+    if (venueId) {
+      venue = await this.venueService.getVenueById(venueId, false);
+    }
+
+    let sport: Sport | undefined = undefined;
+    if (sportId) {
+      sport = await this.sportService.getSportById(sportId);
+    }
+
+    return await this.venueService.updateVenueCourtById(
+      id,
+      name ?? '',
+      venue,
+      sport,
+    );
   }
 
   @Delete('court/:id')
-  async deleteCourtById() {
-    // remove from venue_court and venue
+  async deleteCourtById(@Param('id') id: number) {
+    return this.venueService.deleteVenueCourtById(id);
   }
 }

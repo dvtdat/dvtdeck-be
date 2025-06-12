@@ -161,6 +161,38 @@ export class VenueService {
     };
   }
 
+  async updateVenueCourtById(
+    id: number,
+    name: string | undefined,
+    venue: Venue | undefined,
+    sport: Sport | undefined,
+  ) {
+    const existingCourt = await this.venueCourtRepository.findOne(
+      { id, deletedAt: null },
+      { populate: ['venue', 'sport'] },
+    );
+
+    if (!existingCourt) {
+      throw new NotFoundException(`Venue court with ID ${id} not found`);
+    }
+
+    if (name !== undefined) {
+      existingCourt.name = name;
+    }
+
+    if (venue !== undefined) {
+      existingCourt.venue = venue;
+    }
+
+    if (sport !== undefined) {
+      existingCourt.sport = sport;
+    }
+
+    return await this.venueCourtRepository
+      .getEntityManager()
+      .persistAndFlush(existingCourt);
+  }
+
   async deleteVenueCourtById(id: number) {
     const venueCourt = await this.venueCourtRepository.findOne({
       id,
