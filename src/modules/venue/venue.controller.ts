@@ -18,7 +18,7 @@ import { GetVenueCourtsPaginatedDto } from './dtos/get-venue-courts-paginated.dt
 import { VenueCourt } from '@/entities/venue-court.entity';
 import { Populate } from '@mikro-orm/core';
 import { GetVenueByIdDto } from './dtos/get-venue-by-id.dto';
-import { UpdateVenueCourtDto } from './dtos/update-venue-cout.dto';
+import { UpdateVenueCourtDto } from './dtos/update-venue-court.dto';
 import { Venue } from '@/entities/venue.entity';
 import { Sport } from '@/entities/sport.entity';
 
